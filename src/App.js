@@ -1,54 +1,65 @@
 import React from 'react';
+import Header from './components/header/header';
+import Navegacion from './components/navegacion/navegacion';
+import Hoteles from './components/hoteles/hoteles';
+import Moment from 'moment';
 import './App.css';
 
 class App extends React.Component {
+  constructor() {
+    super();
 
-  constructor(props) {
-    super(props);
+    const today = new Date()
+    const todayFormatted = Moment(today).format("YYYY-MM-DD")
+    const nextMonthFormatted = Moment(today).add(1,'month').format("YYYY-MM-DD")
 
     this.state = {
-      value:''
+      value: '',
+      hoteles:[],
+      hotelesFiltrados:[],
+      filtros : {
+        dateFrom:todayFormatted,
+        dateTo:nextMonthFormatted,
+        pais:'select',
+        precio:'select',
+        habitaciones:'select'
+      },
+      cargaInicialHoteles : false
+    };
+  }
+
+  logConsole(){
+    console.log(this.state.hoteles);
+    console.log(this.state.cargaInicialHoteles);
+  }
+
+  async componentDidMount() {
+    try {
+      const response = await fetch('https://wt-8a099f3e7c73b2d17f4e018b6cfd6131-0.sandbox.auth0-extend.com/acamica');
+      if(!response.ok){
+        throw Error(response.statusText);
+      }
+
+      const json = await response.json();
+      this.setState({
+        hoteles:json,
+        cargaInicialHoteles:true
+      });
+
+      this.logConsole();
+
+    } catch (err) {
+      console.log(err);
     }
   }
 
   render() {
+
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 class="title">Se encontraron XXX hoteles</h1>
-          <h1 class="subtitle">desde la fecha hasta la fecha</h1>
-        </header>
-        <div className="Filtros">
-          <div class="column">
-            <div class="dropdown ">
-              <div class="dropdown-trigger">
-                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-              <span>Dropdown button</span>
-              <span class="icon is-small">
-                <i class="fa fa-angle-down" aria-hidden="true"></i>
-              </span>
-            </button>
-              </div>
-            <div class="dropdown-menu" id="dropdown-menu" role="menu">
-            <div class="dropdown-content">
-              <a href="#" class="dropdown-item">
-                Dropdown item
-              </a>
-              <a class="dropdown-item">
-                Other dropdown item
-              </a>
-              <a href="#" class="dropdown-item is-active">
-                Active dropdown item
-              </a>
-              <a href="#" class="dropdown-item">
-                Other dropdown item
-              </a>
-            </div>
-          </div>
-          </div>
-        </div>
-        
-        </div>
+        <Header nroHotelesDisponibles={this.state.hoteles.length} />
+        <Navegacion filtrosDefault={this.state.filtros}/>
+        <Hoteles lista={this.state.hoteles}/>
       </div>
     );
   }

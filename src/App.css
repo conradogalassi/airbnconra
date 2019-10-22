@@ -1,14 +1,13 @@
+
+@import 'C:\airbnconra\node_modules\bulmaswatch\minty\bulmaswatch.min.css';
+@import 'C:\airbnconra\node_modules\bulma-calendar\dist\css\bulma-calendar.min.css';
+
 .App {
   text-align: left;
 }
 
-.App-logo {
-  height: 40vmin;
-}
-
 .App-header {
-  background-color: #1155dd;
-  /* min-height: 100vh; */
+  background-color: #4e3dee;
   display: flex;
   flex-direction: column;
   align-items: left;
