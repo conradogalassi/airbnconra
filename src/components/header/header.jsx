@@ -14,7 +14,13 @@ class Header extends React.Component {
               Hoteles Acamica
             </h1>
             <h2 className="subtitle">
-              Se han encontrado {this.props.nroHotelesDisponibles} hoteles disponibles
+              {
+                (this.props.hotelesEncontrados > 0) ? ( 
+                <p>Se han encontrado {this.props.hotelesEncontrados} hoteles disponibles</p>
+                ) : (
+                <p>No se han encontrado hoteles disponibles</p>
+                )
+              }
             </h2>
           </div>
         </div>

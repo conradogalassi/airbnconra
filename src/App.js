@@ -9,28 +9,47 @@ class App extends React.Component {
   constructor() {
     super();
 
-    const today = new Date()
-    const todayFormatted = Moment(today).format("YYYY-MM-DD")
-    const nextMonthFormatted = Moment(today).add(1,'month').format("YYYY-MM-DD")
+    const hoy = new Date()
+    const formatoHoy = Moment(hoy).format("YYYY-MM-DD")
+    const formatoMesProximo = Moment(hoy).add(1,'month').format("YYYY-MM-DD")
 
     this.state = {
-      value: '',
       hoteles:[],
       hotelesFiltrados:[],
       filtros : {
-        dateFrom:todayFormatted,
-        dateTo:nextMonthFormatted,
-        pais:'select',
-        precio:'select',
-        habitaciones:'select'
+        fechaDesde : formatoHoy,
+        fechaHasta : formatoMesProximo,
+        pais : 'select',
+        precio : 'select',
+        habitaciones :'select'
       },
       cargaInicialHoteles : false
     };
+
+    this.handleFilterChange=this.handleFilterChange.bind(this);
   }
 
-  logConsole(){
-    console.log(this.state.hoteles);
-    console.log(this.state.cargaInicialHoteles);
+  filtrarHoteles(filtroAplicar,hoteles) {
+    let{fechaDesde,fechaHasta,pais,precio,habitaciones} = filtroAplicar;
+
+    console.log(filtroAplicar);
+    
+    return hoteles.filter(hotel =>{
+      return Moment(hotel.availabilityFrom).format("YYYY-MM-DD") >= fechaDesde &&
+             Moment(hotel.availabilityTo).format("YYYY-MM-DD") <= fechaHasta &&
+             hotel.rooms <= (habitaciones !== 'select' ? habitaciones : hotel.rooms) &&
+             hotel.price <=(precio !== 'select' ? parseInt(precio) : hotel.price) &&
+             hotel.country.trim().toLowerCase() === (pais !== 'select' ? pais.trim().toLowerCase() : hotel.country.trim().toLowerCase())
+    })
+  }
+
+  handleFilterChange(filtroActualizado) {  // el argumento filtroActualizado vendria desde componente hijo Navegacion
+    const hotelesBuscados =  this.filtrarHoteles(filtroActualizado,this.state.hoteles);
+    
+    this.setState({
+      filtros : filtroActualizado,
+      hotelesFiltrados : hotelesBuscados
+    });
   }
 
   async componentDidMount() {
@@ -43,10 +62,9 @@ class App extends React.Component {
       const json = await response.json();
       this.setState({
         hoteles:json,
+        hotelesFiltrados:json,
         cargaInicialHoteles:true
       });
-
-      this.logConsole();
 
     } catch (err) {
       console.log(err);
@@ -54,12 +72,11 @@ class App extends React.Component {
   }
 
   render() {
-
     return (
       <div className="App">
-        <Header nroHotelesDisponibles={this.state.hoteles.length} />
-        <Navegacion filtrosDefault={this.state.filtros}/>
-        <Hoteles lista={this.state.hoteles}/>
+        <Header hotelesEncontrados={this.state.hotelesFiltrados.length} />
+        <Navegacion filtros={this.state.filtros} onFilterChange={this.handleFilterChange}/>
+        <Hoteles filtrados={this.state.hotelesFiltrados}/>   
       </div>
     );
   }

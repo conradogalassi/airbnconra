@@ -7,14 +7,14 @@ class Hoteles extends React.Component {
   }
 
   render() {
-    const {lista} = this.props;
+    const {filtrados} = this.props;
 
     return (
       <section className="section">
         <div className="container">
           <div className="columns is-multiline">
-            {lista ? (
-              lista.map((value, index) => (
+            {filtrados ? (
+              filtrados.map((value, index) => (
                 <div className="column is-one-third" key={index}>
                   <Hotel datos={value}/>
                 </div>
